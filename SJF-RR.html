@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SJF Algorithm Calculator</title>
+  <style>
+    /* Style for Gantt Chart */
+    .gantt {
+      display: flex;
+      margin-top: 20px;
+      align-items: center;
+      font-size: 14px;
+    }
+    .block {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>SJF Algorithm Calculator</h1>
+  <label for="processes">Enter Processes (comma-separated):</label>
+  <input type="text" id="processes">
+  <button onclick="calculateSJF()">Calculate SJF</button>
+
+  <div id="ganttChart"></div>
+
+  <h1>Round Robin Algorithm Calculator</h1>
+
+  <label for="processesRR">Enter Processes for Round Robin (comma-separated):</label>
+<input type="text" id="processesRR">
+<label for="quantum">Enter Quantum:</label>
+<input type="number" id="quantum">
+<button onclick="calculateRoundRobin()">Calculate Round Robin</button>
+
+<div id="ganttChartRR"></div>
+
+  
+
+  <script>
+    function calculateSJF() {
+  const processesInput = document.getElementById('processes').value;
+  const processes = processesInput.split(',').map(process => parseInt(process.trim()));
+
+  // Sort processes by their burst time (or duration)
+  processes.sort((a, b) => a - b);
+
+  const ganttChart = document.getElementById('ganttChart');
+  ganttChart.innerHTML = ''; // Clear previous data
+
+  let chartContent = '';
+  let startTime = 0;
+
+  const waitingTimes = new Array(processes.length).fill(0);
+  const turnaroundTimes = new Array(processes.length).fill(0);
+
+  processes.forEach((process, index) => {
+    const processName = `P${index + 1}`;
+    chartContent += `<div class="block" style="width: ${process * 20}px;">${processName}</div>`;
+    startTime += process;
+
+    turnaroundTimes[index] = startTime;
+    waitingTimes[index] = startTime - process;
+  });
+
+  ganttChart.innerHTML = chartContent;
+
+  // Calculate average waiting time and turnaround time
+  const averageWaitingTime = waitingTimes.reduce((total, time) => total + time, 0) / processes.length;
+  const averageTurnaroundTime = turnaroundTimes.reduce((total, time) => total + time, 0) / processes.length;
+
+  // Display results
+  const resultsDiv = document.createElement('div');
+  resultsDiv.innerHTML = `
+    <h3>Results</h3>
+    <p>Waiting Times: ${waitingTimes.join(', ')}</p>
+    <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
+    <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
+    <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
+  `;
+  ganttChart.appendChild(resultsDiv);
+}
+
+function calculateRoundRobin() {
+  const processesInput = document.getElementById('processesRR').value;
+  const quantum = parseInt(document.getElementById('quantum').value);
+  const processes = processesInput.split(',').map(process => parseInt(process.trim()));
+
+  let remainingProcesses = [...processes];
+  const ganttChart = document.getElementById('ganttChartRR');
+  ganttChart.innerHTML = ''; // Clear previous data
+
+  let chartContent = '';
+  let currentTime = 0;
+
+  const waitingTimes = new Array(processes.length).fill(0);
+  const turnaroundTimes = new Array(processes.length).fill(0);
+
+  while (remainingProcesses.length > 0) {
+    for (let i = 0; i < remainingProcesses.length; i++) {
+      const processTime = Math.min(quantum, remainingProcesses[i]);
+
+      chartContent += `<div class="block" style="width: ${processTime * 20}px;">P${i + 1}</div>`;
+      currentTime += processTime;
+      remainingProcesses[i] -= processTime;
+
+      if (remainingProcesses[i] === 0) {
+        turnaroundTimes[i] = currentTime;
+      } else {
+        waitingTimes[i] += currentTime - (processes.length - remainingProcesses.length) * quantum - waitingTimes.reduce((a, b) => a + b, 0);
+      }
+
+      if (remainingProcesses[i] === 0) {
+        remainingProcesses.splice(i, 1);
+        i--;
+      }
+    }
+  }
+
+  ganttChart.innerHTML = chartContent;
+
+  // Calculate average waiting time and turnaround time
+  const averageWaitingTime = waitingTimes.reduce((total, time) => total + time, 0) / processes.length;
+  const averageTurnaroundTime = turnaroundTimes.reduce((total, time) => total + time, 0) / processes.length;
+
+  // Display results
+  const resultsDiv = document.createElement('div');
+  resultsDiv.innerHTML = `
+    <h3>Results</h3>
+    <p>Waiting Times: ${waitingTimes.join(', ')}</p>
+    <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
+    <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
+    <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
+  `;
+  ganttChart.appendChild(resultsDiv);
+}
+
+  </script>
+</body>
+</html>
