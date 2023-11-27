@@ -1,0 +1,28 @@
+/* Style for Gantt Chart */
+.gantt {
+    display: flex;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .block {
+    border: 1px solid #3498db;
+    padding: 10px;
+    text-align: center;
+    background-color: #ecf0f1;
+    color: #34495e;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  /* Applying offsets to elements */
+  .block:nth-child(2) {
+    margin-left: 50px;
+  }
+  
+  .block:nth-child(3) {
+    margin-left: 100px;
+  }
+  
+  /* Add more nth-child styles as needed for additional blocks */
+  
