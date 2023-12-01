@@ -1,43 +1,52 @@
 function getNumberOfProcesses(algorithm) {
-    const numberOfProcesses = parseInt(document.getElementById(algorithm === 'sjf' ? 'sjfProcessNum' : 'rrProcessNum').value);
-  
-    if (isNaN(numberOfProcesses) || numberOfProcesses <= 0) {
-      const errorMsg = document.getElementById(algorithm === 'sjf' ? 'sjfError' : 'rrError');
-      errorMsg.innerHTML = 'Please enter a valid number of processes.';
-      return;
-    }
-  
-    const inputDiv = document.getElementById(algorithm === 'sjf' ? 'sjfInput' : 'rrInput');
-    inputDiv.innerHTML = '';
-  
-    for (let i = 0; i < numberOfProcesses; i++) {
-      const inputField = document.createElement('input');
-      inputField.setAttribute('type', 'number');
-      inputField.setAttribute('placeholder', `Process ${i + 1}`);
-      inputField.setAttribute('id', `${algorithm === 'sjf' ? 'sjfProcess' : 'rrProcess'}${i + 1}`);
-      inputDiv.appendChild(inputField);
-    }
+  const numberOfProcesses = parseInt(document.getElementById(algorithm === 'sjf' ? 'sjfProcessNum' : 'rrProcessNum').value);
+
+  if (isNaN(numberOfProcesses) || numberOfProcesses <= 0) {
     const errorMsg = document.getElementById(algorithm === 'sjf' ? 'sjfError' : 'rrError');
-    errorMsg.innerHTML = ''; // Clear previous error message if any
+    errorMsg.innerHTML = 'Please enter a valid number of processes.';
+    return;
   }
 
+  const inputDiv = document.getElementById(algorithm === 'sjf' ? 'sjfInput' : 'rrInput');
+  inputDiv.innerHTML = '';
 
-  function calculateSJF() {
-    const numberOfProcesses = document.getElementById('sjfInput').childElementCount;
-  
-    const processes = [];
-  
-    for (let i = 1; i <= numberOfProcesses; i++) {
-      const processValue = parseInt(document.getElementById(`sjfProcess${i}`).value);
-  
-      if (isNaN(processValue) || processValue < 0) {
-        const errorMsg = document.getElementById('sjfError');
-        errorMsg.innerHTML = 'Process values should be positive integers.';
-        return;
-      }
-  
-      processes.push(processValue);
+  for (let i = 0; i < numberOfProcesses; i++) {
+    const arrivalInput = document.createElement('input');
+    arrivalInput.setAttribute('type', 'number');
+    arrivalInput.setAttribute('placeholder', `Arrival Time P${i + 1}`);
+    arrivalInput.setAttribute('id', `${algorithm === 'sjf' ? 'sjfArrival' : 'rrArrival'}${i + 1}`);
+    inputDiv.appendChild(arrivalInput);
+
+    const burstInput = document.createElement('input');
+    burstInput.setAttribute('type', 'number');
+    burstInput.setAttribute('placeholder', `Burst Time P${i + 1}`);
+    burstInput.setAttribute('id', `${algorithm === 'sjf' ? 'sjfBurst' : 'rrBurst'}${i + 1}`);
+    inputDiv.appendChild(burstInput);
+  }
+
+  const errorMsg = document.getElementById(algorithm === 'sjf' ? 'sjfError' : 'rrError');
+  errorMsg.innerHTML = ''; // Clear previous error message if any
+}
+
+
+function calculateSJF() {
+  const numberOfProcesses = document.getElementById('sjfInput').childElementCount / 2; // Divide by 2 for arrival and burst time inputs
+
+  const processes = [];
+
+  for (let i = 1; i <= numberOfProcesses; i++) {
+    const arrivalTime = parseInt(document.getElementById(`sjfArrival${i}`).value);
+    const burstTime = parseInt(document.getElementById(`sjfBurst${i}`).value);
+
+    if (isNaN(arrivalTime) || isNaN(burstTime) || arrivalTime < 0 || burstTime <= 0) {
+      const errorMsg = document.getElementById('sjfError');
+      errorMsg.innerHTML = 'Enter valid positive integers for arrival and burst times.';
+      return;
     }
+
+    processes.push({ arrivalTime, burstTime });
+  }
+
   
     processes.sort((a, b) => a - b);
   
