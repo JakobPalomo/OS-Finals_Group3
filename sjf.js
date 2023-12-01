@@ -83,21 +83,4 @@ function calculate() {
   document.getElementById('results').style.display = 'block';
 
   document.getElementById('ganttChart').innerHTML = ganttChartHTML;
-  const tryAnotherButton = '<button onclick="resetCalculator()">Try Another Calculation</button>';
-  document.getElementById('tryAnother').innerHTML = tryAnotherButton;
-}
-
-function resetCalculator() {
-  // Clearing inputs
-  document.getElementById('inputs').innerHTML = '';
-
-  // Clearing results and hiding the display
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('results').style.display = 'none';
-
-  // Clearing Gantt chart
-  document.getElementById('ganttChart').innerHTML = '';
-
-  // Clearing "Try Another Calculation" button
-  document.getElementById('tryAnother').innerHTML = '';
 }
