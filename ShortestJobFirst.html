@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>SJF Algorithm Calculator</title>
-
-  <script src="sjf.js"></script>
   <link rel="stylesheet" href="style.css">
-
 </head>
+<style>
+
+
+</style>
 <body>
-  <h1>SJF Algorithm Calculator</h1>
-  <label for="sjfProcessNum">Enter the number of processes for SJF:</label>
-  <input type="number" id="sjfProcessNum">
-  <button onclick="getNumberOfProcesses('sjf')">Enter</button>
-
-  <div id="sjfInput"></div>
-  <button onclick="calculateSJF()">Calculate SJF</button>
-
-  <div id="ganttChart"></div>
-
-  <div id="sjfError" class="error-message"></div> <!-- Display errors for SJF here -->
+  <div class="container">
+    <h1>SJF Algorithm Calculator</h1>
+    <label for="numProcesses">Number of Processes:</label>
+    <input type="number" id="numProcesses" min="1" required>
+    <button onclick="getInputs()">Enter</button>
+    <div id="inputs"></div>
+    <div id="results"></div>
+    <div id="ganttChart"></div>
+    <button onclick="resetCalculator()">Try Another Calculation</button>
+  </div>
+  <script src="sjf.js"></script>
 </body>
 </html>

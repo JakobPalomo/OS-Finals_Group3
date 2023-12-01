@@ -1,86 +1,103 @@
-function getNumberOfProcesses(algorithm) {
-  const numberOfProcesses = parseInt(document.getElementById(algorithm === 'sjf' ? 'sjfProcessNum' : 'rrProcessNum').value);
-
-  if (isNaN(numberOfProcesses) || numberOfProcesses <= 0) {
-    const errorMsg = document.getElementById(algorithm === 'sjf' ? 'sjfError' : 'rrError');
-    errorMsg.innerHTML = 'Please enter a valid number of processes.';
+function getInputs() {
+  const numProcesses = document.getElementById('numProcesses').value;
+  if (numProcesses <= 0 || isNaN(numProcesses)) {
+    alert('Please enter a valid number of processes.');
     return;
   }
 
-  const inputDiv = document.getElementById(algorithm === 'sjf' ? 'sjfInput' : 'rrInput');
-  inputDiv.innerHTML = '';
-
-  for (let i = 0; i < numberOfProcesses; i++) {
-    const arrivalInput = document.createElement('input');
-    arrivalInput.setAttribute('type', 'number');
-    arrivalInput.setAttribute('placeholder', `Arrival Time P${i + 1}`);
-    arrivalInput.setAttribute('id', `${algorithm === 'sjf' ? 'sjfArrival' : 'rrArrival'}${i + 1}`);
-    inputDiv.appendChild(arrivalInput);
-
-    const burstInput = document.createElement('input');
-    burstInput.setAttribute('type', 'number');
-    burstInput.setAttribute('placeholder', `Burst Time P${i + 1}`);
-    burstInput.setAttribute('id', `${algorithm === 'sjf' ? 'sjfBurst' : 'rrBurst'}${i + 1}`);
-    inputDiv.appendChild(burstInput);
+  let inputsHTML = '<h2>Enter Arrival Times and Burst Times</h2>';
+  for (let i = 0; i < numProcesses; i++) {
+    inputsHTML += `<div>
+      <label for="arrivalTime${i}">Arrival Time for Process ${i + 1}:</label>
+      <input type="number" id="arrivalTime${i}" min="0" required>
+      <label for="burstTime${i}">Burst Time for Process ${i + 1}:</label>
+      <input type="number" id="burstTime${i}" min="1" required>
+    </div>`;
   }
 
-  const errorMsg = document.getElementById(algorithm === 'sjf' ? 'sjfError' : 'rrError');
-  errorMsg.innerHTML = ''; // Clear previous error message if any
+  inputsHTML += '<button onclick="calculate()">Calculate</button>';
+  document.getElementById('inputs').innerHTML = inputsHTML;
 }
 
+function calculate() {
+  const numProcesses = document.getElementById('numProcesses').value;
+  let processes = [];
 
-function calculateSJF() {
-  const numberOfProcesses = document.getElementById('sjfInput').childElementCount / 2; // Divide by 2 for arrival and burst time inputs
+  for (let i = 0; i < numProcesses; i++) {
+    const arrivalTime = parseInt(document.getElementById(`arrivalTime${i}`).value);
+    const burstTime = parseInt(document.getElementById(`burstTime${i}`).value);
 
-  const processes = [];
-
-  for (let i = 1; i <= numberOfProcesses; i++) {
-    const arrivalTime = parseInt(document.getElementById(`sjfArrival${i}`).value);
-    const burstTime = parseInt(document.getElementById(`sjfBurst${i}`).value);
-
-    if (isNaN(arrivalTime) || isNaN(burstTime) || arrivalTime < 0 || burstTime <= 0) {
-      const errorMsg = document.getElementById('sjfError');
-      errorMsg.innerHTML = 'Enter valid positive integers for arrival and burst times.';
+    if (arrivalTime < 0 || burstTime <= 0 || isNaN(arrivalTime) || isNaN(burstTime)) {
+      alert('Please enter valid arrival and burst times.');
       return;
     }
 
-    processes.push({ arrivalTime, burstTime });
+    processes.push({ index: i + 1, arrival: arrivalTime, burst: burstTime, completed: false });
   }
 
-  
-    processes.sort((a, b) => a - b);
-  
-    const ganttChart = document.getElementById('ganttChart');
-    ganttChart.innerHTML = '';
-  
-    let chartContent = '';
-    let startTime = 0;
-  
-    const waitingTimes = new Array(processes.length).fill(0);
-    const turnaroundTimes = new Array(processes.length).fill(0);
-  
-    processes.forEach((process, index) => {
-      const processName = `P${index + 1}`;
-      chartContent += `<div class="block" style="width: ${process * 20}px;">${processName}</div>`;
-      startTime += process;
-  
-      turnaroundTimes[index] = startTime;
-      waitingTimes[index] = startTime - process;
-    });
-  
-    ganttChart.innerHTML = chartContent;
-  
-    const averageWaitingTime = waitingTimes.reduce((total, time) => total + time, 0) / processes.length;
-    const averageTurnaroundTime = turnaroundTimes.reduce((total, time) => total + time, 0) / processes.length;
-  
-    const resultsDiv = document.createElement('div');
-    resultsDiv.innerHTML = `
-      <h3>Results</h3>
-      <p>Waiting Times: ${waitingTimes.join(', ')}</p>
-      <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
-      <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
-      <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
-    `;
-    ganttChart.appendChild(resultsDiv);
+  processes.sort((a, b) => a.arrival - b.arrival);
+
+  let currentTime = 0;
+  let completionTimes = new Array(numProcesses).fill(0);
+  let turnaroundTimes = new Array(numProcesses).fill(0);
+  let waitingTimes = new Array(numProcesses).fill(0);
+  let ganttChartHTML = '<h2>Gantt Chart</h2><div class="gantt">';
+
+  while (true) {
+    let minBurst = Number.MAX_SAFE_INTEGER;
+    let selectedProcess = -1;
+    
+    // Find the process with minimum burst time among the arrived and incomplete processes
+    for (let i = 0; i < numProcesses; i++) {
+      if (processes[i].arrival <= currentTime && processes[i].completed === false && processes[i].burst < minBurst) {
+        minBurst = processes[i].burst;
+        selectedProcess = i;
+      }
+    }
+
+    if (selectedProcess === -1) {
+      break;
+    }
+
+    const currentProcess = processes[selectedProcess];
+    ganttChartHTML += `<div class="bar" style="width: ${currentProcess.burst * 20}px;">P${currentProcess.index}</div>`;
+
+    completionTimes[selectedProcess] = currentTime + currentProcess.burst;
+    currentTime = completionTimes[selectedProcess];
+    currentProcess.completed = true;
+
+    turnaroundTimes[selectedProcess] = completionTimes[selectedProcess] - currentProcess.arrival;
+    waitingTimes[selectedProcess] = turnaroundTimes[selectedProcess] - currentProcess.burst;
   }
-  
+
+  ganttChartHTML += '</div>';
+
+  const averageWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0) / numProcesses;
+  const averageTurnaroundTime = turnaroundTimes.reduce((acc, val) => acc + val, 0) / numProcesses;
+
+  document.getElementById('results').innerHTML = `<h2>Results</h2>
+    <p>Waiting Times: ${JSON.stringify(waitingTimes)}</p>
+    <p>Turnaround Times: ${JSON.stringify(turnaroundTimes)}</p>
+    <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
+    <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>`;
+  document.getElementById('results').style.display = 'block';
+
+  document.getElementById('ganttChart').innerHTML = ganttChartHTML;
+  const tryAnotherButton = '<button onclick="resetCalculator()">Try Another Calculation</button>';
+  document.getElementById('tryAnother').innerHTML = tryAnotherButton;
+}
+
+function resetCalculator() {
+  // Clearing inputs
+  document.getElementById('inputs').innerHTML = '';
+
+  // Clearing results and hiding the display
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('results').style.display = 'none';
+
+  // Clearing Gantt chart
+  document.getElementById('ganttChart').innerHTML = '';
+
+  // Clearing "Try Another Calculation" button
+  document.getElementById('tryAnother').innerHTML = '';
+}
