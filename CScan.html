@@ -8,12 +8,14 @@
   <script src="rr.js"></script>
   <script src="sjf.js"></script>
   <script src="cscan.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="CScanStyle.css">
 
 </head>
 <body>
 
   <h1>CSCAN Algorithm Calculator</h1>
+  <div id="mainDiv">
+  <div id="leftDiv">
   <label for="currentPosition">Current Position:</label>
   <input type="number" id="currentPosition">
   <label for="trackSize">Track Size:</label>
@@ -22,10 +24,16 @@
   <input type="number" id="seekRate">
   <label for="numRequests">Number of Requests (Max 10):</label>
   <input type="number" id="numRequests" max="10">
+</div>
+
+
+  <div id="rightDiv">
   <div id="cscanRequests"></div>
   <button onclick="getCSCANRequests()">Enter Requests</button>
 
   <div id="cscanGraph"></div>
   <button onclick="calculateCSCAN()">Calculate CSCAN</button>
+</div>
+</div>
 </body>
 </html>
