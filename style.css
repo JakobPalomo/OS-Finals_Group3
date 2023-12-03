@@ -59,3 +59,64 @@
       color: white;
       text-align: center;
     }
+
+    /* Resetting default margin and padding */
+body, h1, a {
+  margin: 0;
+  padding: 0;
+}
+
+/* Basic styling for the container */
+.container {
+  width: 80%;
+  margin: 50px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Styling for the main title */
+h1 {
+  margin-bottom: 20px;
+}
+
+/* Styling for the options */
+.options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Styling for algorithm option squares */
+.square {
+  width: 150px;
+  height: 150px;
+  margin: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1.2em;
+  color: #fff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+/* SJF square style */
+.sjf {
+  background-color: #3498db;
+}
+
+/* Round Robin square style */
+.round-robin {
+  background-color: #2ecc71;
+}
+
+/* C-SCAN square style */
+.cscan {
+  background-color: #e74c3c;
+}
+
+/* Hover effect */
+.square:hover {
+  opacity: 0.8;
+}
