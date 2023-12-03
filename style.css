@@ -1,67 +1,5 @@
-    /* Resetting default margin and padding */
-    body, h1, h2, div, p, label, input, button {
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* Basic styling for the container */
-    .container {
-      width: 80%;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-    }
-    
-    /* Styling for the main title */
-    h1 {
-      margin-bottom: 20px;
-    }
-    
-    /* Input field and button styling */
-    input[type="number"], button {
-      margin-bottom: 10px;
-      padding: 5px;
-    }
-    
-    button {
-      cursor: pointer;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    
-    button:hover {
-      background-color: #2980b9;
-    }
-    
-    /* Styling for results and Gantt chart section */
-    #results, #ganttChart {
-      margin-top: 20px;
-    }
-    
-    /* Styling for Gantt chart */
-    .gantt {
-      display: flex;
-      align-items: center;
-      margin-top: 20px;
-    }
-    
-    .bar {
-      height: 30px;
-      line-height: 30px;
-      border: 1px solid #333;
-      padding: 0 10px;
-      margin-right: 5px;
-      background-color: #3498db;
-      color: white;
-      text-align: center;
-    }
-
-    /* Resetting default margin and padding */
-body, h1, a {
+/* Resetting default margin and padding */
+body, h1, h2, div, p, label, input, button, a {
   margin: 0;
   padding: 0;
 }
@@ -69,7 +7,7 @@ body, h1, a {
 /* Basic styling for the container */
 .container {
   width: 80%;
-  margin: 50px auto;
+  margin: 50px auto; /* Center the container */
   text-align: center;
   font-family: Arial, sans-serif;
 }
@@ -77,6 +15,63 @@ body, h1, a {
 /* Styling for the main title */
 h1 {
   margin-bottom: 20px;
+}
+
+/* Input field and button styling */
+input[type="number"],
+button {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+button {
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+/* Styling for results and Gantt chart section */
+#ganttChart,
+.gantt-chart {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Gantt Chart Styling */
+.timeline,
+.process-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timeline div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #333;
+  background-color: #fff;
+  margin-right: 5px;
+}
+
+.process-bar div {
+  height: 30px;
+  line-height: 30px;
+  border: 1px solid #333;
+  padding: 0 10px;
+  margin-right: 5px;
+  background-color: #3498db;
+  color: white;
+  text-align: center;
 }
 
 /* Styling for the options */
@@ -121,42 +116,12 @@ h1 {
   opacity: 0.8;
 }
 
-/* Gantt Chart Styling */
-.gantt-chart {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.timeline {
-  display: flex;
-  align-items: center;
+.input-group {
   margin-bottom: 10px;
 }
 
-.timeline div {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #333;
-  background-color: #fff;
-  margin-right: 5px;
-}
-
-.process-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.process-bar div {
-  height: 30px;
-  line-height: 30px;
-  border: 1px solid #333;
-  padding: 0 10px;
-  margin-right: 5px;
-  background-color: #3498db;
-  color: white;
-  text-align: center;
+.input-group label,
+.input-group input {
+  display: block;
 }
 
