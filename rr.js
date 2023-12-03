@@ -1,36 +1,38 @@
 function getRoundRobinInputs() {
-    const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
-  
-    // Validation for "Number of Processes: "
-    if (isNaN(numProcesses) || numProcesses <= 0 || numProcesses > 10) {
-      const errorMsg = document.getElementById('rrError');
-      errorMsg.innerHTML = 'Please enter a valid number of processes (1-10).';
-      return;
-    }
-  
-    const rrInputsDiv = document.getElementById('rrInputs');
-    rrInputsDiv.innerHTML = '';
-  
-    // Display Process Burst Time input fields
-    for (let i = 1; i <= numProcesses; i++) {
-      const processDiv = document.createElement('div');
-      processDiv.innerHTML = `
-        <label for="burstTime${i}">Process ${i} Burst Time:</label>
-        <input type="number" id="burstTime${i}" class="rrInput" required><br><br>
-      `;
-      rrInputsDiv.appendChild(processDiv);
-    }
-  
-    // Time quantum input field
-    const timeQuantumInput = document.createElement('input');
-    timeQuantumInput.setAttribute('type', 'number');
-    timeQuantumInput.setAttribute('placeholder', 'Enter Time Quantum');
-    timeQuantumInput.setAttribute('id', 'timeQuantum');
-    rrInputsDiv.appendChild(timeQuantumInput);
-  
+  const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
+
+  // Validation for "Number of Processes"
+  if (isNaN(numProcesses) || numProcesses < 2 || numProcesses > 9) {
     const errorMsg = document.getElementById('rrError');
-    errorMsg.innerHTML = ''; // Clear previous error message if any
+    errorMsg.innerHTML = 'Please enter a valid number of processes (2-9).';
+    return;
   }
+
+  const rrInputsDiv = document.getElementById('rrInputs');
+  rrInputsDiv.innerHTML = '';
+
+  for (let i = 1; i <= numProcesses; i++) {
+    const processDiv = document.createElement('div');
+    processDiv.innerHTML = `
+      <label for="arrivalTime${i}">Arrival Time for Process ${i}:</label>
+      <input type="number" id="arrivalTime${i}" class="rrInput" min="0" required>
+      <label for="burstTime${i}">Burst Time for Process ${i}:</label>
+      <input type="number" id="burstTime${i}" class="rrInput" min="1" required><br><br>
+    `;
+    rrInputsDiv.appendChild(processDiv);
+  }
+
+  // Time quantum input field
+  const timeQuantumInput = document.createElement('input');
+  timeQuantumInput.setAttribute('type', 'number');
+  timeQuantumInput.setAttribute('placeholder', 'Enter Time Quantum');
+  timeQuantumInput.setAttribute('id', 'timeQuantum');
+  rrInputsDiv.appendChild(timeQuantumInput);
+
+  const errorMsg = document.getElementById('rrError');
+  errorMsg.innerHTML = ''; // Clear previous error message if any
+}
+
   
   function calculateRoundRobin() {
     const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
@@ -120,3 +122,9 @@ function getRoundRobinInputs() {
     `;
     ganttChart.appendChild(resultsDiv);
   }
+
+  function resetCalculator() {
+    // Reload the page
+    window.location.reload();
+  }
+  

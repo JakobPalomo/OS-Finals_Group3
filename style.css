@@ -120,3 +120,43 @@ h1 {
 .square:hover {
   opacity: 0.8;
 }
+
+/* Gantt Chart Styling */
+.gantt-chart {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timeline div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #333;
+  background-color: #fff;
+  margin-right: 5px;
+}
+
+.process-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.process-bar div {
+  height: 30px;
+  line-height: 30px;
+  border: 1px solid #333;
+  padding: 0 10px;
+  margin-right: 5px;
+  background-color: #3498db;
+  color: white;
+  text-align: center;
+}
+
