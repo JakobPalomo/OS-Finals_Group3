@@ -45,14 +45,16 @@ function getRoundRobinInputs() {
       return;
     }
   
+    const arrivalTimes = [];
     const burstTimes = [];
   
     // Get values of burst time input fields
     for (let i = 1; i <= numProcesses; i++) {
+      const arrivalTime = parseInt(document.getElementById(`arrivalTime${i}`).value);
       const burstTime = parseInt(document.getElementById(`burstTime${i}`).value);
   
       // Validation for burst time input fields
-      if (isNaN(burstTime) || burstTime <= 0) {
+      if (isNaN(arrivalTime) || arrivalTime < 0 || isNaN(burstTime) || burstTime <= 0) {
         const errorMsg = document.getElementById('rrError');
         errorMsg.innerHTML = 'Please enter valid arrival and burst times for each process.';
         return;
