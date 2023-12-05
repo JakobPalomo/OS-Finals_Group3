@@ -46,6 +46,7 @@ function getRoundRobinInputs() {
               return;
             }
           
+            let processes = [];
             let arrivalTimes = [];
             let burstTimes = [];
           
@@ -61,11 +62,13 @@ function getRoundRobinInputs() {
                 return;
               }
           
-              arrivalTimes.push(arrivalTime)
+              processes.push(i);
+              arrivalTimes.push(arrivalTime);
               burstTimes.push(burstTime);
             }
           
             let currentTime = 0;
+            let processIndex = 0;
             let remainingProcesses = [...Array(numProcesses).keys()]; // Represents processes yet to be executed
             let ganttChart = document.getElementById('ganttChartRR');
             ganttChart.innerHTML = '';
@@ -74,30 +77,30 @@ function getRoundRobinInputs() {
           
             let waitingTimes = new Array(numProcesses).fill(0);
             let turnaroundTimes = new Array(numProcesses).fill(0);
-          
-            while (remainingProcesses.length > 0) {
-              for (let processIndex of remainingProcesses) {
-                if (burstTimes[processIndex] > 0) {
-                  let executionTime = Math.min(burstTimes[processIndex], timeQuantum);
-                  chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${processIndex + 1}</div>`;
-                  
-                  currentTime += executionTime;
-                  burstTimes[processIndex] -= executionTime;
-                 
-                  if (burstTimes[processIndex] > 0) {
-                    waitingTimes[processIndex] += executionTime;
+            let completed = new Array(numProcesses).fill(false);
+            let queue = [];
+
+            try {
+              while (true) {
+                for (let i = 0; i <= currentTime; i++) {
+                  if (arrivalTimes[processIndex] <= currentTime) {
+                    queue.push(processes[processIndex]);
+                    console.log("pushed " + processes[processIndex]);
                   }
-        
-                  if (burstTimes[processIndex] === 0) {
-                    turnaroundTimes[processIndex] = currentTime - arrivalTimes[processIndex];
-                  }
-          
-                  remainingProcesses = remainingProcesses.filter(index => burstTimes[index] > 0);
+                  console.log("push loop " + i);
                 }
-                alert(processIndex);
+
+                if (burstTimes[processIndex] <= timeQuantum) {
+                  currentTime += burstTimes[processIndex];
+                  burstTimes[processIndex] = 0;
+                }
+
+                
               }
+            } catch (error) {
+              console.log(error.message);
             }
-          
+
             ganttChart.innerHTML = chartContent;
           
             let totalWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0);
@@ -115,7 +118,7 @@ function getRoundRobinInputs() {
             `;
             ganttChart.appendChild(resultsDiv);
         } catch (error) {
-            alert(error.message);
+            console.log(errorMsg);
         }
       }
   
