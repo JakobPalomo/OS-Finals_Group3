@@ -70,22 +70,14 @@ function getRoundRobinInputs() {
   
     let chartContent = '';
   
-    const responseTimesSet = new Array(numProcesses).fill(false);
-
     const waitingTimes = new Array(numProcesses).fill(0);
     const turnaroundTimes = new Array(numProcesses).fill(0);
-    const responseTimes = new Array(numProcesses).fill(0);
   
     while (remainingProcesses.length > 0) {
       for (const processIndex of remainingProcesses) {
         if (burstTimes[processIndex] > 0) {
           const executionTime = Math.min(burstTimes[processIndex], timeQuantum);
           chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${processIndex + 1}</div>`;
-          
-          if (!responseTimesSet[processIndex]) {
-            responseTimes[processIndex] = currentTime;
-            responseTimesSet[processIndex] = true;
-          }
           
           currentTime += executionTime;
           burstTimes[processIndex] -= executionTime;
@@ -100,6 +92,7 @@ function getRoundRobinInputs() {
   
           remainingProcesses = remainingProcesses.filter(index => burstTimes[index] > 0);
         }
+        alert(processIndex);
       }
     }
   
