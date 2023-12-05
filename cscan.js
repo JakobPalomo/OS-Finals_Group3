@@ -4,6 +4,8 @@ function getCSCANRequests() {
   const seekRate = parseInt(document.getElementById('seekRate').value);
   const numRequests = parseInt(document.getElementById('numRequests').value);
 
+  
+
   if (
     isNaN(currentPosition) || isNaN(trackSize) || isNaN(seekRate) ||
     isNaN(numRequests) || numRequests <= 0 || numRequests > 10 ||
@@ -24,6 +26,7 @@ function getCSCANRequests() {
     inputField.setAttribute('id', `cscanRequest${i + 1}`);
     requestsDiv.appendChild(inputField);
   }
+  document.getElementById('calculateButton').style.visibility = 'visible';
 }
 
 function calculateCSCAN() {
@@ -86,4 +89,9 @@ console.log("Total Seek Time:", totalSeekTime);
   cscanGraph.appendChild(graphDiv);
 }
 
-//comment It appears that your code for calculating the total seek time in the CSCAN algorithm is encountering an issue that results in NaN. To troubleshoot this issue, you should consider checking for the edge case where arr[index + 1] is undefined, which can happen when you reach the last element of the array.
+//comment It appears that your code for calculating the total seek time in the CSCAN algorithm is encountering an issue that results in NaN. To troubleshoot this issue, you should consider checking for the edge case where arr[index + 1] is undefined, which can happen when you reach the last element of the array.  
+
+function resetCalculator() {
+  // Reload the page
+  window.location.reload();
+}
