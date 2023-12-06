@@ -34,96 +34,86 @@ function getRoundRobinInputs() {
 }
 
   
-  function calculateRoundRobin() {
-    const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
-    const timeQuantum = parseInt(document.getElementById('timeQuantum').value);
-  
-    // Validation for inputs
-    if (isNaN(numProcesses) || numProcesses <= 0 || numProcesses > 10 || isNaN(timeQuantum) || timeQuantum <= 0) {
-      const errorMsg = document.getElementById('rrError');
-      errorMsg.innerHTML = 'Please enter valid inputs.';
-      return;
-    }
-  
-    const arrivalTimes = [];
-    const burstTimes = [];
-  
-    // Get values of burst time input fields
-    for (let i = 1; i <= numProcesses; i++) {
-      const arrivalTime = parseInt(document.getElementById(`arrivalTime${i}`).value);
-      const burstTime = parseInt(document.getElementById(`burstTime${i}`).value);
-  
-      // Validation for burst time input fields
-      if (isNaN(arrivalTime) || arrivalTime < 0 || isNaN(burstTime) || burstTime <= 0) {
-        const errorMsg = document.getElementById('rrError');
-        errorMsg.innerHTML = 'Please enter valid arrival and burst times for each process.';
-        return;
-      }
-  
-      burstTimes.push(burstTime);
-    }
-  
-    let currentTime = 0;
-    let remainingProcesses = [...Array(numProcesses).keys()]; // Represents processes yet to be executed
-    const ganttChart = document.getElementById('ganttChartRR');
-    ganttChart.innerHTML = '';
-  
-    let chartContent = '';
-  
-    const responseTimesSet = new Array(numProcesses).fill(false);
+function calculateRoundRobin() {
+  const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
+  const timeQuantum = parseInt(document.getElementById('timeQuantum').value);
 
-    const waitingTimes = new Array(numProcesses).fill(0);
-    const turnaroundTimes = new Array(numProcesses).fill(0);
-    const responseTimes = new Array(numProcesses).fill(0);
-  
-    while (remainingProcesses.length > 0) {
-      for (const processIndex of remainingProcesses) {
-        if (burstTimes[processIndex] > 0) {
-          const executionTime = Math.min(burstTimes[processIndex], timeQuantum);
-          chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${processIndex + 1}</div>`;
-          
-          if (!responseTimesSet[processIndex]) {
-            responseTimes[processIndex] = currentTime;
-            responseTimesSet[processIndex] = true;
-          }
-          
-          currentTime += executionTime;
-          burstTimes[processIndex] -= executionTime;
-         
-          if (burstTimes[processIndex] > 0) {
-            waitingTimes[processIndex] += executionTime;
-          }
+  const arrivalTimes = [];
+  const burstTimes = [];
+  let remainingBurstTimes = []; // Tracks remaining burst times
+  let processQueue = []; // Queue to keep track of the processes
 
-          if (burstTimes[processIndex] === 0) {
-            turnaroundTimes[processIndex] = currentTime;
-          }
-  
-          remainingProcesses = remainingProcesses.filter(index => burstTimes[index] > 0);
-        }
-      }
-    }
-  
-    ganttChart.innerHTML = chartContent;
-  
-    const totalResponseTime = responseTimes.reduce((acc, val) => acc + val, 0);
-    const averageResponseTime = totalResponseTime / numProcesses;
-    const totalWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0);
-    const averageWaitingTime = totalWaitingTime / numProcesses;
-    const totalTurnaroundTime = turnaroundTimes.reduce((acc, val) => acc + val, 0);
-    const averageTurnaroundTime = totalTurnaroundTime / numProcesses;
-  
-    const resultsDiv = document.createElement('div');
-    resultsDiv.innerHTML = `
-      <h3>Results</h3>
-      <p>Response Times: ${responseTimes.join(', ')}</p>
-      <p>Waiting Times: ${waitingTimes.join(', ')}</p>
-      <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
-      <p>Average Response Time: ${averageResponseTime.toFixed(2)}</p>
-      <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
-      <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
-    `;
-    ganttChart.appendChild(resultsDiv);
+  for (let i = 1; i <= numProcesses; i++) {
+    const arrivalTime = parseInt(document.getElementById(`arrivalTime${i}`).value);
+    const burstTime = parseInt(document.getElementById(`burstTime${i}`).value);
+
+    arrivalTimes.push(arrivalTime);
+    burstTimes.push(burstTime);
+    remainingBurstTimes.push(burstTime);
+    processQueue.push(i - 1);
   }
+
+  let currentTime = 0;
+  const ganttChart = document.getElementById('ganttChartRR');
+  ganttChart.innerHTML = '';
+
+  let chartContent = '';
+  let responseTimes = new Array(numProcesses).fill(0);
+  let waitingTimes = new Array(numProcesses).fill(0);
+  let turnaroundTimes = new Array(numProcesses).fill(0);
+
+  while (processQueue.length > 0) {
+    const currentProcess = processQueue.shift();
+
+    if (remainingBurstTimes[currentProcess] > 0) {
+      const executionTime = Math.min(remainingBurstTimes[currentProcess], timeQuantum);
+
+      chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${currentProcess + 1}</div>`;
+
+      if (responseTimes[currentProcess] === 0) {
+        responseTimes[currentProcess] = currentTime;
+      }
+
+      currentTime += executionTime;
+      remainingBurstTimes[currentProcess] -= executionTime;
+
+      if (remainingBurstTimes[currentProcess] === 0) {
+        turnaroundTimes[currentProcess] = currentTime - arrivalTimes[currentProcess];
+      } else {
+        processQueue.push(currentProcess); // Re-add the process if it still has burst time left
+      }
+    }
+  }
+
+  ganttChart.innerHTML = chartContent;
+
+  for (let i = 0; i < numProcesses; i++) {
+    waitingTimes[i] = turnaroundTimes[i] - burstTimes[i];
+  }
+
+  const totalResponseTime = responseTimes.reduce((acc, val) => acc + val, 0);
+  const totalWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0);
+  const totalTurnaroundTime = turnaroundTimes.reduce((acc, val) => acc + val, 0);
+
+  const averageResponseTime = totalResponseTime / numProcesses;
+  const averageWaitingTime = totalWaitingTime / numProcesses;
+  const averageTurnaroundTime = totalTurnaroundTime / numProcesses;
+
+  // Displaying results in HTML
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = `
+    <h3>Results</h3>
+    <p>Response Times: ${responseTimes.join(', ')}</p>
+    <p>Waiting Times: ${waitingTimes.join(', ')}</p>
+    <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
+    <p>Average Response Time: ${averageResponseTime.toFixed(2)}</p>
+    <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
+    <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
+  `;
+}
+
+
+
 
   function resetCalculator() {
     // Reload the page
