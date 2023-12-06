@@ -43,11 +43,10 @@ function calculate() {
   let waitingTimes = new Array(numProcesses).fill(0);
   let ganttChartHTML = '<h2>Gantt Chart</h2><div class="gantt">';
 
-  while (true) {
+  while (processes.some(process => !process.completed)) {
     let minBurst = Number.MAX_SAFE_INTEGER;
     let selectedProcess = -1;
-    
-    // Find the process with minimum burst time among the arrived and incomplete processes
+
     for (let i = 0; i < numProcesses; i++) {
       if (processes[i].arrival <= currentTime && processes[i].completed === false && processes[i].burst < minBurst) {
         minBurst = processes[i].burst;
@@ -56,7 +55,8 @@ function calculate() {
     }
 
     if (selectedProcess === -1) {
-      break;
+      currentTime++;
+      continue;
     }
 
     const currentProcess = processes[selectedProcess];
@@ -84,3 +84,13 @@ function calculate() {
 
   document.getElementById('ganttChart').innerHTML = ganttChartHTML;
 }
+
+
+function resetCalculator() {
+  // Reload the page
+  window.location.reload();
+}
+
+
+
+
