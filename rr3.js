@@ -47,8 +47,6 @@ function getRoundRobinInputs() {
             }
           
             let processes = [];
-            let arrivalTimes = [];
-            let burstTimes = [];
           
             // Get values of burst time input fields
             for (let i = 1; i <= numProcesses; i++) {
@@ -62,43 +60,61 @@ function getRoundRobinInputs() {
                 return;
               }
           
-              processes.push(i);
-              arrivalTimes.push(arrivalTime);
-              burstTimes.push(burstTime);
+              processes.push({id: i, arrivalTimes: arrivalTime, burstTimes: burstTime});
             }
           
             let currentTime = 0;
-            let processIndex = 0;
             let remainingProcesses = [...Array(numProcesses).keys()]; // Represents processes yet to be executed
             let ganttChart = document.getElementById('ganttChartRR');
             ganttChart.innerHTML = '';
           
             let chartContent = '';
+            let iterations = 0;
           
             let waitingTimes = new Array(numProcesses).fill(0);
             let turnaroundTimes = new Array(numProcesses).fill(0);
             let completed = new Array(numProcesses).fill(false);
             let queue = [];
+            let complete = false;
 
-            try {
-              while (true) {
-                for (let i = 0; i <= currentTime; i++) {
-                  if (arrivalTimes[processIndex] <= currentTime) {
-                    queue.push(processes[processIndex]);
-                    console.log("pushed " + processes[processIndex]);
-                  }
-                  console.log("push loop " + i);
+            while (!complete) {
+
+              for (let i = 0; i < numProcesses; i++) {
+                if (processes[i] <= currentTime && !completed[i]) {
+                  queue.push(processes[i]);
                 }
-
-                if (burstTimes[processIndex] <= timeQuantum) {
-                  currentTime += burstTimes[processIndex];
-                  burstTimes[processIndex] = 0;
-                }
-
-                
               }
-            } catch (error) {
-              console.log(error.message);
+
+              for (let i = 0; i = numProcesses; i++) {
+                if (queue[i] && queue[i].burstTimes > 0) {
+                  if (queue[i].burstTimes > timeQuantum) {
+                    currentTime += timeQuantum;
+                    queue[i].burstTimes -= timeQuantum;
+                  } else {
+                    currentTime += queue[i].burstTimes;
+                    queue[i].burstTimes = 0;
+                    completed[i] = true;
+                    turnaroundTimes[i] = currentTime - processes[i].arrivalTimes;
+                  }
+                }
+              }
+
+              for (let i = 0; i < numProcesses; i++) {
+                if (queue[i] && queue[i].burstTimes > 0) {
+                  queue.push(queue.shift());
+                }
+              }
+
+              // check if algo is done
+              if (completed.every(val => val === true)){
+                complete = true;
+              }
+              console.log(iterations);
+              iterations++;
+            }
+
+            for (let i = 0; i < numProcesses; i++) {
+              waitingTimes[i] = turnaroundTimes[i] - processes[i].burstTimes;
             }
 
             ganttChart.innerHTML = chartContent;
@@ -127,3 +143,40 @@ function getRoundRobinInputs() {
       window.location.reload();
     }
     
+    /*
+    try {
+      while (true) {
+        let processIndex = queue[0].id - 1;
+
+        if (queue[0].burstTimes <= timeQuantum) {
+          currentTime += queue[0].burstTimes;
+          completed[processIndex] = true;
+          queue[0].burstTimes = 0;
+        } else {
+          currentTime += timeQuantum;
+          queue[0].burstTimes -= timeQuantum;
+        }
+
+        queue.shift();
+
+        if (queue[0].burstTimes === 0) {
+          turnaroundTimes[processIndex] = currentTime;
+        }
+
+        for (let i = 0; i <= currentTime; i++) {
+          if (processes[i].arrivalTimes <= currentTime) {
+            if (!queue.includes(processes[i])){
+              queue.push(processes[i]);
+            }
+
+            console.log("pushed " + processes[i]);
+          }
+          console.log("push loop " + i);
+        }
+        
+
+
+      }
+    } catch (error) {
+      console.log(error.LineNumber + error.message);
+    }*/
