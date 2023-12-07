@@ -38,64 +38,133 @@ function calculateRoundRobin() {
   const numProcesses = parseInt(document.getElementById('rrNumProcesses').value);
   const timeQuantum = parseInt(document.getElementById('timeQuantum').value);
 
-  const arrivalTimes = [];
-  const burstTimes = [];
-  let remainingBurstTimes = []; // Tracks remaining burst times
-  let processQueue = []; // Queue to keep track of the processes
+  let processes = [];
 
+  //loop for accessing arrival and burst entries
   for (let i = 1; i <= numProcesses; i++) {
     const arrivalTime = parseInt(document.getElementById(`arrivalTime${i}`).value);
     const burstTime = parseInt(document.getElementById(`burstTime${i}`).value);
 
-    arrivalTimes.push(arrivalTime);
-    burstTimes.push(burstTime);
-    remainingBurstTimes.push(burstTime);
-    processQueue.push(i - 1);
+
+    processes.push({
+      pId: i,
+      arrivalTime: arrivalTime,
+      burstTime: burstTime,
+      remBurstTime: burstTime,
+      complete: false
+    });
   }
 
-  let currentTime = 0;
   const ganttChart = document.getElementById('ganttChartRR');
   ganttChart.innerHTML = '';
 
   let chartContent = '';
-  let responseTimes = new Array(numProcesses).fill(0);
+  
+
+  let waitingTimesSet = new Array(numProcesses).fill(false);
   let waitingTimes = new Array(numProcesses).fill(0);
   let turnaroundTimes = new Array(numProcesses).fill(0);
+  let completed = new Array(numProcesses).fill(false);
+  
+  let time = 0;
+  let readyQ = [];
+  let currentProcess = [];
 
-  while (processQueue.length > 0) {
-    const currentProcess = processQueue.shift();
+  while (true) {
+    
+    console.log(time);
+    
+    
 
-    if (remainingBurstTimes[currentProcess] > 0) {
-      const executionTime = Math.min(remainingBurstTimes[currentProcess], timeQuantum);
-
-      chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${currentProcess + 1}</div>`;
-
-      if (responseTimes[currentProcess] === 0) {
-        responseTimes[currentProcess] = currentTime;
-      }
-
-      currentTime += executionTime;
-      remainingBurstTimes[currentProcess] -= executionTime;
-
-      if (remainingBurstTimes[currentProcess] === 0) {
-        turnaroundTimes[currentProcess] = currentTime - arrivalTimes[currentProcess];
-      } else {
-        processQueue.push(currentProcess); // Re-add the process if it still has burst time left
+    //pushing of processes into the ready queue
+    for (let i = 0; i < numProcesses; i++) {
+      if (processes[i].arrivalTime <= time) {
+        //checks if process is already in the ready queue
+        if (readyQ.some(process => process.pId === processes[i].pId)) {
+          console.log("Process: " + processes[i].pId + " is already in queue");
+        } else {
+          //checks if process is already done
+          if (processes[i].complete){
+            console.log("Process " + processes[i].pId +" is already done");
+          } else {
+            if (processes[i].burstTime == processes[i].remBurstTime) {
+              readyQ.push(processes[i]);
+              console.log("Process: " + processes[i].pId + " pushed");
+            }
+          }
+        }
       }
     }
+
+    if (currentProcess[0] == undefined) {
+      console.log("curentprocess = undefined");
+    } else {
+      readyQ.push(currentProcess[0]);
+      console.log("CurrentProcess " + currentProcess[0].pId);
+    }
+    let executionTime = Math.min(readyQ[0].burstTime, timeQuantum);
+    chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${readyQ[0].pId}</div>`;
+    console.log("READY QUEUE: ID " + readyQ[0].pId + " AT" + readyQ[0].arrivalTime + " BT" + readyQ[0].burstTime + " RBT" + readyQ[0].remBurstTime + " C" + readyQ[0].complete);
+
+    if (!readyQ.length > 0) {
+      time++;
+      continue;
+    }
+
+    //is burst time less than or equal to time quantum
+    if (readyQ[0].remBurstTime <= timeQuantum) {
+      console.log("burst time: " + readyQ[0].burstTime + " is <= to time quantum");
+
+
+      if (!waitingTimesSet[(readyQ[0].pId)-1]){
+        waitingTimes[(readyQ[0].pId)-1] += time;
+        waitingTimesSet[(readyQ[0].pId)-1] = true;
+        console.log("Process ID: " + readyQ[0].pId + " WAITING TIME SET");
+      }
+
+      time += readyQ[0].remBurstTime;
+      readyQ[0].remBurstTime = 0;
+      readyQ[0].complete = true;
+      completed[(readyQ[0].pId)-1] = true;
+
+      turnaroundTimes[(readyQ[0].pId)-1] = time - readyQ[0].arrivalTime;
+
+      console.log("Process " + readyQ[0].pId + " complete.");
+
+      readyQ.shift();
+    } else {
+      console.log("burst time:" + readyQ[0].burstTime + " is > than time quantum");
+
+      waitingTimes[(readyQ[0].pId)-1] -=  timeQuantum;
+
+      time += timeQuantum;
+      readyQ[0].remBurstTime -= timeQuantum;
+      if (readyQ.length > 0) {
+        currentProcess[0] = readyQ.shift();
+      }
+    }
+
+    if (completed.every(item => item === true)) {
+      console.log("ROUND ROBIN DONE");
+      break;
+    }
+
+    
   }
+
+  for (let i = 0; i < numProcesses; i++) {
+    waitingTimes[i] -= processes[i].arrivalTime;
+  }
+  
+  
 
   ganttChart.innerHTML = chartContent;
 
-  for (let i = 0; i < numProcesses; i++) {
-    waitingTimes[i] = turnaroundTimes[i] - burstTimes[i];
-  }
-
-  const totalResponseTime = responseTimes.reduce((acc, val) => acc + val, 0);
+  //const totalResponseTime = responseTimes.reduce((acc, val) => acc + val, 0);
   const totalWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0);
   const totalTurnaroundTime = turnaroundTimes.reduce((acc, val) => acc + val, 0);
 
-  const averageResponseTime = totalResponseTime / numProcesses;
+  //const averageResponseTime = totalResponseTime / numProcesses;
   const averageWaitingTime = totalWaitingTime / numProcesses;
   const averageTurnaroundTime = totalTurnaroundTime / numProcesses;
 
@@ -103,10 +172,8 @@ function calculateRoundRobin() {
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = `
     <h3>Results</h3>
-    <p>Response Times: ${responseTimes.join(', ')}</p>
     <p>Waiting Times: ${waitingTimes.join(', ')}</p>
     <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
-    <p>Average Response Time: ${averageResponseTime.toFixed(2)}</p>
     <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
     <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
   `;
