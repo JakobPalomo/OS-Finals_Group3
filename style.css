@@ -91,6 +91,7 @@ button:hover {
   align-items: center;
   text-decoration: none;
   font-size: 1.2em;
+  font-size: 24px;
   color: #fff;
   border-radius: 8px;
   transition: background-color 0.3s ease;
@@ -125,3 +126,39 @@ button:hover {
   display: block;
 }
 
+/* Styling for the results section */
+#results {
+  margin: 0 auto; /* Center the table horizontally */
+  width: 80%; /* Set a width to limit its size */
+}
+
+/* Styling for the results section */
+#results {
+  margin: 20px auto; /* Center the table horizontally and add some space */
+  width: 80%; /* Set a width to limit its size */
+  border-collapse: collapse; /* Collapse table borders for a cleaner look */
+  font-family: Arial, sans-serif; /* Set a clean, common font */
+}
+
+/* Styling for the table headers */
+#results th {
+  background-color: #3498db; /* Set header background color */
+  color: white; /* Set text color for headers */
+  padding: 10px; /* Add padding to header cells */
+}
+
+/* Styling for table rows */
+#results td {
+  border: 1px solid #ccc; /* Add borders to table cells */
+  padding: 8px; /* Add padding to cells */
+}
+
+/* Styling for alternating rows (zebra-striping) */
+#results tr:nth-child(even) {
+  background-color: #f2f2f2; /* Set background color for even rows */
+}
+
+/* Styling for the last row (averages row) */
+#results tr:last-child {
+  font-weight: bold; /* Make the last row bold to highlight averages */
+}

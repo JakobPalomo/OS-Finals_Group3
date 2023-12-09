@@ -75,22 +75,24 @@ function calculate() {
   const averageWaitingTime = waitingTimes.reduce((acc, val) => acc + val, 0) / numProcesses;
   const averageTurnaroundTime = turnaroundTimes.reduce((acc, val) => acc + val, 0) / numProcesses;
 
-  document.getElementById('results').innerHTML = `<h2>Results</h2>
-    <p>Waiting Times: ${JSON.stringify(waitingTimes)}</p>
-    <p>Turnaround Times: ${JSON.stringify(turnaroundTimes)}</p>
-    <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
-    <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>`;
-  document.getElementById('results').style.display = 'block';
+  // Generate the results table
+  let tableHTML = '<h2>Calculation Results</h2><table border="1">';
+  tableHTML += '<tr><th>Process Id</th><th>Exit Time</th><th>Turnaround Time</th><th>Waiting Time</th></tr>';
 
+  for (let i = 0; i < numProcesses; i++) {
+    tableHTML += `<tr><td>P${processes[i].index}</td><td>${completionTimes[i]}</td><td>${turnaroundTimes[i]}</td><td>${waitingTimes[i]}</td></tr>`;
+  }
+
+  tableHTML += `<tr><td colspan="2"><b>Average:</b></td><td>${averageTurnaroundTime.toFixed(2)}</td><td>${averageWaitingTime.toFixed(2)}</td></tr>`;
+  tableHTML += '</table>';
+
+  // Display the results table and Gantt chart
+  document.getElementById('results').innerHTML = tableHTML;
+  document.getElementById('results').style.display = 'block';
   document.getElementById('ganttChart').innerHTML = ganttChartHTML;
 }
-
 
 function resetCalculator() {
   // Reload the page
   window.location.reload();
 }
-
-
-
-
