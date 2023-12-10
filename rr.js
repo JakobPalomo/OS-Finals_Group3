@@ -102,14 +102,15 @@ function calculateRoundRobin() {
       readyQ.push(currentProcess[0]);
       console.log("CurrentProcess " + currentProcess[0].pId);
     }
-    let executionTime = Math.min(readyQ[0].burstTime, timeQuantum);
-    //chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${readyQ[0].pId}</div>`;
-    console.log("READY QUEUE: ID " + readyQ[0].pId + " AT" + readyQ[0].arrivalTime + " BT" + readyQ[0].burstTime + " RBT" + readyQ[0].remBurstTime + " C" + readyQ[0].complete);
-
     if (!readyQ.length > 0) {
       time++;
       continue;
     }
+    let executionTime = Math.min(readyQ[0].burstTime, timeQuantum);
+    //chartContent += `<div class="block" style="width: ${executionTime * 20}px;">P${readyQ[0].pId}</div>`;
+    console.log("READY QUEUE: ID " + readyQ[0].pId + " AT" + readyQ[0].arrivalTime + " BT" + readyQ[0].burstTime + " RBT" + readyQ[0].remBurstTime + " C" + readyQ[0].complete);
+
+    
 
     //is burst time less than or equal to time quantum
     if (readyQ[0].remBurstTime <= timeQuantum) {
