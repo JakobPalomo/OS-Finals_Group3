@@ -73,6 +73,8 @@ function calculateRoundRobin() {
   while (true) {
     
     console.log(time);
+
+    
     
     
 
@@ -102,6 +104,14 @@ function calculateRoundRobin() {
       readyQ.push(currentProcess[0]);
       console.log("CurrentProcess " + currentProcess[0].pId);
     }
+
+    //checking readyQ
+    if (readyQ.length > 0) {
+      for (let i = 0; i < readyQ.length; i++) {
+        console.log("Queue Order: " + readyQ[i].pId + " ")
+      }
+    }
+
     if (!readyQ.length > 0) {
       time++;
       continue;
@@ -171,13 +181,36 @@ function calculateRoundRobin() {
 
   // Displaying results in HTML
   const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = `
-    <h3>Results</h3>
-    <p>Waiting Times: ${waitingTimes.join(', ')}</p>
-    <p>Turnaround Times: ${turnaroundTimes.join(', ')}</p>
+  let HTMLcontent = `
+  <h3>Results</h3>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Arrival Time</th>
+      <th>Burst Time</th>
+      <th>Waiting Time</th>
+      <th>Turnaround Time</th>
+    </tr>
+  `;
+    for (let i = 0; i < numProcesses; i++) {
+      HTMLcontent +=  `
+      <tr>
+        <td>${processes[i].pId}</td>
+        <td>${processes[i].arrivalTime}</td>
+        <td>${processes[i].burstTime}</td>
+        <td>${waitingTimes[i]}</td>
+        <td>${turnaroundTimes[i]}</td>
+      </tr>
+      `;
+    }
+
+  HTMLcontent += `
     <p>Average Waiting Time: ${averageWaitingTime.toFixed(2)}</p>
     <p>Average Turnaround Time: ${averageTurnaroundTime.toFixed(2)}</p>
   `;
+
+  resultsDiv.innerHTML = HTMLcontent;
 }
 
 
