@@ -130,7 +130,11 @@ button:hover {
 #results {
   margin: 0 auto; /* Center the table horizontally */
   width: 80%; /* Set a width to limit its size */
+  align-items: center;
+  align-content: center;
+  align-self: center;
 }
+
 
 /* Styling for the results section */
 #results {
