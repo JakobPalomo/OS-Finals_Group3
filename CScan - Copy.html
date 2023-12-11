@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSCAN Disk Scheduling</title>
+    <style>
+      /* Resetting default margin and padding */
+      body, h1, form, select, input, button {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      /* Centering content */
+      body {
+          display: flex;
+          justify-content: center;
+          
+          height: 100vh;
+          font-family: Arial, sans-serif;
+          background-color: #eeb3ac;
+      }
+
+      /* Container styling */
+      .container {
+          width: 80%;
+          text-align: center;
+          background-color: #eeb3ac;
+          padding: 20px;
+        
+      }
+
+      h1 {
+          margin-bottom: 20px;
+      }
+
+      /* Form input and button styling */
+      form {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+
+      label {
+          margin-bottom: 5px;
+          font-weight: bold;
+      }
+
+      select, input, button {
+          margin-bottom: 10px;
+          padding: 10px;
+          width: calc(50% - 20px);
+          max-width: 300px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          font-size: 16px;
+          box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+          transition: border-color 0.3s ease;
+      }
+
+      input:focus, select:focus {
+          outline: none;
+          border-color: #3498db;
+      }
+
+      button {
+          cursor: pointer;
+          background-color: #3498db;
+          color: white;
+          border: none;
+          transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+          background-color: #2980b9;
+      }
+
+      /* Result section styling */
+      #results {
+          margin-top: 20px;
+          font-family: Arial, sans-serif;
+      }
+
+      #results h2 {
+          margin-bottom: 10px;
+      }
+
+      #results ul {
+          padding-left: 20px;
+      }
+
+      #results ul li {
+          list-style: none;
+          margin-bottom: 5px;
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <h1>CSCAN Disk Scheduling</h1>
+      <form id="diskForm" onsubmit="performCSCAN(); return false;">
+          <label for="initialPosition">Initial Position:</label>
+          <input type="number" id="initialPosition" min="0" required><br>
+
+          <label for="trackSize">Track Size:</label>
+          <input type="number" id="trackSize" min="1" required><br>
+
+          <label for="direction">Direction:</label>
+          <select id="direction" required>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+          </select><br>
+
+          <label for="requestSequence">Request Sequence (comma-separated):</label>
+          <input type="text" id="requestSequence" required><br>
+
+          <button type="submit">Calculate CSCAN</button>
+      </form>
+
+      <div id="results"></div>
+        <script>
+            function performCSCAN() {
+                let head = parseInt(document.getElementById('initialPosition').value);
+                let diskSize = parseInt(document.getElementById('trackSize').value);
+                let direction = document.getElementById('direction').value;
+                let sequence = document.getElementById('requestSequence').value.split(',').map(Number);
+
+                let size = sequence.length;
+
+                let seek_count = 0;
+                let distance, cur_track;
+                let left = [], right = [];
+                let seek_sequence = [];
+
+                left.push(0);
+                right.push(diskSize - 1);
+
+                for (let i = 0; i < size; i++) {
+                    if (sequence[i] < head)
+                        left.push(sequence[i]);
+                    if (sequence[i] > head)
+                        right.push(sequence[i]);
+                }
+
+                left.sort(function(a, b){return a - b});
+                right.sort(function(a, b){return a - b});
+
+                for (let i = 0; i < right.length; i++) {
+                    cur_track = right[i];
+                    seek_sequence.push(cur_track);
+                    distance = Math.abs(cur_track - head);
+                    seek_count += distance;
+                    head = cur_track;
+                }
+
+                head = 0;
+                seek_count += (diskSize - 1);
+
+                for (let i = 0; i < left.length; i++) {
+                    cur_track = left[i];
+                    seek_sequence.push(cur_track);
+                    distance = Math.abs(cur_track - head);
+                    seek_count += distance;
+                    head = cur_track;
+                }
+
+                displayResults(seek_count, seek_sequence);
+            }
+
+            function displayResults(totalSeekOperations, seekSequence) {
+                let output = "<h2>Results</h2>";
+                output += "<p>Total number of seek operations = " + totalSeekOperations + "</p>";
+                output += "<p>Seek Sequence:</p>";
+                output += "<ul>";
+                for (let i = 0; i < seekSequence.length; i++) {
+                    output += "<li>" + seekSequence[i] + "</li>";
+                }
+                output += "</ul>";
+
+                document.getElementById('results').innerHTML = output;
+            }
+        </script>
+    </div>
+</body>
+</html>
