@@ -4,17 +4,13 @@
     <title>Round Robin Calculator</title>
     <style>
         /* Resetting default margin and padding */
-        body, h1, h2, div, p, label, input, button, a {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box; /* Include padding and border in element's total width and height */
-        }
+        
 
         /* Centering all content */
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
+            
             height: 100vh;
             font-family: Arial, sans-serif;
         }
@@ -35,13 +31,13 @@
         button {
             margin-bottom: 10px;
             padding: 10px;
-            width: calc(50% - 20px); /* Set input fields and buttons to 50% width */
+            width: calc(20% - 20px); /* Set input fields and buttons to 50% width */
             max-width: 300px; /* Set maximum width for input fields and buttons */
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
             box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-            display: block; /* Ensure each input/button is on a new line */
+            
             margin: 0 auto 10px; /* Center and add space below each input/button */
         }
 
@@ -129,7 +125,7 @@
         }
     </style>
 </head>
-<body>
+<body style="background-color: #a9dabd;">
     <div class="container">
         <h1>Round Robin Calculator</h1>
         <label for="processes">Number of Processes:</label><br>
@@ -140,24 +136,28 @@
         <label for="timeQuanta">Time Quanta:</label><br>
         <input type="number" id="timeQuanta" min="1"><br><br>
 
+        
+        <!-- <div id="ganttChart"></div> -->
+        <div id="output"></div>
         <button onclick="generateInputs()">Set Processes</button><br>
         <button onclick="calculateRR()">Calculate</button><br><br>
-        <div id="ganttChart"></div>
-        <div id="output"></div>
-        
 
         <script>
             function generateInputs() {
-                const numProcesses = parseInt(document.getElementById('processes').value);
-                let inputsHTML = '';
-                for (let i = 0; i < numProcesses; i++) {
-                    inputsHTML += `<label for="arrival${i}">Arrival Time for Process ${i + 1}:</label><br>`;
-                    inputsHTML += `<input type="number" id="arrival${i}" min="0" value="0"><br><br>`;
-                    inputsHTML += `<label for="burst${i}">Burst Time for Process ${i + 1}:</label><br>`;
-                    inputsHTML += `<input type="number" id="burst${i}" min="1" value="1"><br><br>`;
-                }
-                document.getElementById('inputs').innerHTML = inputsHTML;
-            }
+    const numProcesses = parseInt(document.getElementById('processes').value);
+    let inputsHTML = '';
+
+    for (let i = 0; i < numProcesses; i++) {
+        inputsHTML += `<label for="arrival${i}">Arrival Time for Process ${i + 1}:</label>`;
+        inputsHTML += `<input type="number" id="arrival${i}" min="0" value="0">`;
+        inputsHTML += `<label for="burst${i}">Burst Time for Process ${i + 1}:</label>`;
+        inputsHTML += `<input type="number" id="burst${i}" min="1" value="1">`;
+        inputsHTML += '<br>'; // Add a line break to separate each set of inputs
+    }
+
+    document.getElementById('inputs').innerHTML = inputsHTML;
+}
+
 
             function queueUpdation(queue, timer, arrival, n, maxProccessIndex) {
                 let zeroIndex;
