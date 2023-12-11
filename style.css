@@ -135,15 +135,6 @@ button:hover {
   align-self: center;
 }
 
-
-/* Styling for the results section */
-#results {
-  margin: 20px auto; /* Center the table horizontally and add some space */
-  width: 80%; /* Set a width to limit its size */
-  border-collapse: collapse; /* Collapse table borders for a cleaner look */
-  font-family: Arial, sans-serif; /* Set a clean, common font */
-}
-
 /* Styling for the table headers */
 #results th {
   background-color: #3498db; /* Set header background color */
