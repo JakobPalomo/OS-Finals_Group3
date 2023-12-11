@@ -184,7 +184,7 @@ function calculateRoundRobin() {
   let HTMLcontent = `
   <h3>Results</h3>
 
-  <table>
+  <table style="margin: 0 auto;">
     <tr>
       <th>ID</th>
       <th>Arrival Time</th>
