@@ -122,12 +122,14 @@
             background-color: #3498db;
             color: white;
             text-align: center;
+            
         }
     </style>
 </head>
 <body style="background-color: #a9dabd;">
     <div class="container">
         <h1>Round Robin Calculator</h1>
+        <h4>(Disk Scheduling)</h4>
         <label for="processes">Number of Processes:</label><br>
         <input type="number" id="processes" min="1"><br><br>
 
@@ -141,8 +143,13 @@
         <div id="output"></div>
         <button onclick="generateInputs()">Set Processes</button><br>
         <button onclick="calculateRR()">Calculate</button><br><br>
+        <button onclick="resetCalculator()">Reset Calculation</button>
 
         <script>
+          function resetCalculator() {
+  // Reload the page
+  window.location.reload();
+}
             function generateInputs() {
     const numProcesses = parseInt(document.getElementById('processes').value);
     let inputsHTML = '';

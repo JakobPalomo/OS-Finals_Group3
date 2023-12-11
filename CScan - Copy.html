@@ -97,6 +97,7 @@
 <body>
   <div class="container">
       <h1>CSCAN Disk Scheduling</h1>
+      <h4>(Disk Scheduling)</h4>
       <form id="diskForm" onsubmit="performCSCAN(); return false;">
           <label for="initialPosition">Initial Position:</label>
           <input type="number" id="initialPosition" min="0" required><br>
@@ -112,12 +113,17 @@
 
           <label for="requestSequence">Request Sequence (comma-separated):</label>
           <input type="text" id="requestSequence" required><br>
-
+          
           <button type="submit">Calculate CSCAN</button>
+          <button onclick="resetCalculator()">Reset Calculation</button>
       </form>
 
       <div id="results"></div>
         <script>
+          function resetCalculator() {
+  // Reload the page
+  window.location.reload();
+}
             function performCSCAN() {
                 let head = parseInt(document.getElementById('initialPosition').value);
                 let diskSize = parseInt(document.getElementById('trackSize').value);
