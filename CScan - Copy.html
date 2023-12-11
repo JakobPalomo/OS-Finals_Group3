@@ -110,6 +110,9 @@
               <option value="left">Left</option>
               <option value="right">Right</option>
           </select><br>
+          
+          <label for="seekRate">Seek Rate:</label>
+            <input type="number" id="seekRate" min="1" required><br>
 
           <label for="requestSequence">Request Sequence (comma-separated):</label>
           <input type="text" id="requestSequence" required><br>
@@ -125,9 +128,10 @@
   window.location.reload();
 }
             function performCSCAN() {
-                let head = parseInt(document.getElementById('initialPosition').value);
+              let head = parseInt(document.getElementById('initialPosition').value);
                 let diskSize = parseInt(document.getElementById('trackSize').value);
                 let direction = document.getElementById('direction').value;
+                let seekRate = parseInt(document.getElementById('seekRate').value);
                 let sequence = document.getElementById('requestSequence').value.split(',').map(Number);
 
                 let size = sequence.length;
@@ -169,12 +173,15 @@
                     head = cur_track;
                 }
 
-                displayResults(seek_count, seek_sequence);
+                seekRate=seekRate*seek_count
+
+                displayResults(seek_count, seek_sequence, seekRate);
             }
 
-            function displayResults(totalSeekOperations, seekSequence) {
+            function displayResults(totalSeekOperations, seekSequence, seekTime) {
                 let output = "<h2>Results</h2>";
-                output += "<p>Total number of seek operations = " + totalSeekOperations + "</p>";
+                output += "<p>Total head movement = " + totalSeekOperations + "</p>";
+                output += "<p>Seek time = " + seekTime + "</p>";
                 output += "<p>Seek Sequence:</p>";
                 output += "<ul>";
                 for (let i = 0; i < seekSequence.length; i++) {
