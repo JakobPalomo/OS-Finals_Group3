@@ -92,10 +92,45 @@
           list-style: none;
           margin-bottom: 5px;
       }
+      nav{
+        display:flex;
+        justify-content: center;
+        border: black;
+        border-radius: 3%;
+        
+      }
+      a{
+
+        color: rgb(0, 0, 0);
+        text-decoration:none;
+        font-size: larger;
+        transition: transform 0.3s ease;
+        padding:10px;
+      }
+      a:hover{
+        background-color: #ffffff;
+            transform: scale(1.1); /* Increase the scale on hover */
+      }
+
   </style>
+  
 </head>
 <body>
+
+
+      
   <div class="container">
+    <div id="navbor">
+    <nav>
+        
+            <a href="index.html">Back</a>
+            <a href="ShortestJobFirst.html">SJF</a>
+            <a href="RoundRobin - Copy.html">Round Robin</a>
+            <a href="CScan - Copy.html">CScan</a>
+            
+        
+    </nav>
+</div>
       <h1>CSCAN Disk Scheduling</h1>
       <h4>(Disk Scheduling)</h4>
       <form id="diskForm" onsubmit="performCSCAN(); return false;">
