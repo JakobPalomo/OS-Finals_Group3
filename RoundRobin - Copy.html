@@ -2,8 +2,6 @@
 <html>
 <head>
     <title>Round Robin Calculator</title>
-</head>
-
     <style>
         /* Resetting default margin and padding */
         body, h1, h2, div, p, label, input, button, a {
@@ -14,7 +12,7 @@
 
         /* Centering all content */
         body {
-            
+            display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -43,6 +41,8 @@
             border: 1px solid #ccc;
             font-size: 16px;
             box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            display: block; /* Ensure each input/button is on a new line */
+            margin: 0 auto 10px; /* Center and add space below each input/button */
         }
 
         button {
@@ -62,189 +62,249 @@
             margin: 20px auto; /* Center the results div and add some space */
             width: 100%; /* Set a width to occupy the available space */
             max-width: 800px; /* Limit maximum width of the results */
-            border-collapse: collapse; /* Collapse table borders for a cleaner look */
             font-family: Arial, sans-serif; /* Set a clean, common font */
         }
 
+        /* Styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse table borders for a cleaner look */
+            margin-bottom: 20px; /* Add space below the table */
+        }
+
         /* Styling for the table headers */
-        #output th {
+        th {
             background-color: #3498db; /* Set header background color */
             color: white; /* Set text color for headers */
             padding: 10px; /* Add padding to header cells */
         }
 
-        /* Styling for table rows */
-        #output td {
+        /* Styling for table cells */
+        td, th {
             border: 1px solid #ccc; /* Add borders to table cells */
             padding: 8px; /* Add padding to cells */
         }
 
         /* Styling for alternating rows (zebra-striping) */
-        #output tr:nth-child(even) {
+        tr:nth-child(even) {
             background-color: #f2f2f2; /* Set background color for even rows */
         }
 
         /* Styling for the last row (averages row) */
-        #output tr:last-child {
+        tr:last-child {
             font-weight: bold; /* Make the last row bold to highlight averages */
         }
+        #ganttChart {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Gantt Chart Styling */
+        .timeline,
+        .process-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .timeline div {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+            background-color: #fff;
+            margin-right: 5px;
+        }
+
+        .process-bar div {
+            height: 30px;
+            line-height: 30px;
+            border: 1px solid #333;
+            padding: 0 10px;
+            margin-right: 5px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+        }
     </style>
-</style>
+</head>
 <body>
-    <h1>Round Robin Calculator</h1>
-    <label for="processes">Number of Processes:</label>
-    <input type="number" id="processes" min="1" ><br><br>
+    <div class="container">
+        <h1>Round Robin Calculator</h1>
+        <label for="processes">Number of Processes:</label><br>
+        <input type="number" id="processes" min="1"><br><br>
 
-    <div id="inputs"></div><br>
+        <div id="inputs"></div><br>
 
-    <label for="timeQuanta">Time Quanta:</label>
-    <input type="number" id="timeQuanta" min="1"><br><br>
+        <label for="timeQuanta">Time Quanta:</label><br>
+        <input type="number" id="timeQuanta" min="1"><br><br>
 
-    <button onclick="generateInputs()">Set Processes</button>
-    <button onclick="calculateRR()">Calculate</button><br><br>
+        <button onclick="generateInputs()">Set Processes</button><br>
+        <button onclick="calculateRR()">Calculate</button><br><br>
+        <div id="ganttChart"></div>
+        <div id="output"></div>
+        
 
-    <div id="output"></div>
-
-    <script>
-        function generateInputs() {
-            const numProcesses = parseInt(document.getElementById('processes').value);
-            let inputsHTML = '';
-            for (let i = 0; i < numProcesses; i++) {
-                inputsHTML += `<label for="arrival${i}">Arrival Time for Process ${i + 1}:</label>`;
-                inputsHTML += `<input type="number" id="arrival${i}" min="0" value="0"><br><br>`;
-                inputsHTML += `<label for="burst${i}">Burst Time for Process ${i + 1}:</label>`;
-                inputsHTML += `<input type="number" id="burst${i}" min="1" value="1"><br><br>`;
-            }
-            document.getElementById('inputs').innerHTML = inputsHTML;
-        }
-
-        function queueUpdation(queue, timer, arrival, n, maxProccessIndex) {
-            let zeroIndex;
-            for (let i = 0; i < n; i++) {
-                if (queue[i] == 0) {
-                    zeroIndex = i;
-                    break;
-                }
-            }
-            queue[zeroIndex] = maxProccessIndex + 1;
-        }
-
-        function queueMaintainence(queue, n) {
-            for (let i = 0; (i < n - 1) && (queue[i + 1] != 0); i++) {
-                let temp = queue[i];
-                queue[i] = queue[i + 1];
-                queue[i + 1] = temp;
-            }
-        }
-
-        function checkNewArrival(timer, arrival, n, maxProccessIndex, queue) {
-            if (timer <= arrival[n - 1]) {
-                let newArrival = false;
-                for (let j = (maxProccessIndex + 1); j < n; j++) {
-                    if (arrival[j] <= timer) {
-                        if (maxProccessIndex < j) {
-                            maxProccessIndex = j;
-                            newArrival = true;
-                        }
-                    }
-                }
-                if (newArrival)
-                    queueUpdation(queue, timer, arrival, n, maxProccessIndex);
-            }
-        }
-
-        function calculateRR() {
-            const tq = parseInt(document.getElementById('timeQuanta').value);
-            const numProcesses = parseInt(document.getElementById('processes').value);
-            const arrival = [];
-            const burst = [];
-
-            for (let i = 0; i < numProcesses; i++) {
-                arrival.push(parseInt(document.getElementById(`arrival${i}`).value));
-                burst.push(parseInt(document.getElementById(`burst${i}`).value));
-            }
-
-            let timer = 0;
-            let maxProccessIndex = 0;
-            let avgWait = 0;
-            let avgTT = 0;
-            const wait = [];
-            const turn = [];
-            const queue = [];
-            const temp_burst = [];
-            const complete = [];
-
-            for (let i = 0; i < numProcesses; i++) {
-                temp_burst[i] = burst[i];
-                complete[i] = false;
-                queue[i] = 0;
-            }
-            while (timer < arrival[0])
-                timer++;
-            queue[0] = 1;
-
-            while (true) {
-                let flag = true;
+        <script>
+            function generateInputs() {
+                const numProcesses = parseInt(document.getElementById('processes').value);
+                let inputsHTML = '';
                 for (let i = 0; i < numProcesses; i++) {
-                    if (temp_burst[i] != 0) {
-                        flag = false;
+                    inputsHTML += `<label for="arrival${i}">Arrival Time for Process ${i + 1}:</label><br>`;
+                    inputsHTML += `<input type="number" id="arrival${i}" min="0" value="0"><br><br>`;
+                    inputsHTML += `<label for="burst${i}">Burst Time for Process ${i + 1}:</label><br>`;
+                    inputsHTML += `<input type="number" id="burst${i}" min="1" value="1"><br><br>`;
+                }
+                document.getElementById('inputs').innerHTML = inputsHTML;
+            }
+
+            function queueUpdation(queue, timer, arrival, n, maxProccessIndex) {
+                let zeroIndex;
+                for (let i = 0; i < n; i++) {
+                    if (queue[i] == 0) {
+                        zeroIndex = i;
                         break;
                     }
                 }
-                if (flag)
-                    break;
+                queue[zeroIndex] = maxProccessIndex + 1;
+            }
 
-                for (let i = 0; (i < numProcesses) && (queue[i] != 0); i++) {
-                    let ctr = 0;
-                    while ((ctr < tq) && (temp_burst[queue[0] - 1] > 0)) {
-                        temp_burst[queue[0] - 1] -= 1;
-                        timer += 1;
-                        ctr++;
-                        checkNewArrival(timer, arrival, numProcesses, maxProccessIndex, queue);
-                    }
-                    if ((temp_burst[queue[0] - 1] == 0) && (complete[queue[0] - 1] == false)) {
-                        turn[queue[0] - 1] = timer;
-                        complete[queue[0] - 1] = true;
-                    }
-
-                    let idle = true;
-                    if (queue[numProcesses - 1] == 0) {
-                        for (let i = 0; i < numProcesses && queue[i] != 0; i++) {
-                            if (complete[queue[i] - 1] == false) {
-                                idle = false;
-                            }
-                        }
-                    }
-                    else
-                        idle = false;
-
-                    if (idle) {
-                        timer++;
-                        checkNewArrival(timer, arrival, numProcesses, maxProccessIndex, queue);
-                    }
-
-                    queueMaintainence(queue, numProcesses);
+            function queueMaintainence(queue, n) {
+                for (let i = 0; (i < n - 1) && (queue[i + 1] != 0); i++) {
+                    let temp = queue[i];
+                    queue[i] = queue[i + 1];
+                    queue[i + 1] = temp;
                 }
             }
 
-            for (let i = 0; i < numProcesses; i++) {
-                turn[i] = turn[i] - arrival[i];
-                wait[i] = turn[i] - burst[i];
+            function checkNewArrival(timer, arrival, n, maxProccessIndex, queue) {
+                if (timer <= arrival[n - 1]) {
+                    let newArrival = false;
+                    for (let j = (maxProccessIndex + 1); j < n; j++) {
+                        if (arrival[j] <= timer) {
+                            if (maxProccessIndex < j) {
+                                maxProccessIndex = j;
+                                newArrival = true;
+                            }
+                        }
+                    }
+                    if (newArrival)
+                        queueUpdation(queue, timer, arrival, n, maxProccessIndex);
+                }
             }
 
-            let output = "<br>Time Quanta: " + tq + "<br>";
-            output += "Number of Processes: " + numProcesses + "<br>";
-            output += "<br>Program No.\tArrival Time\tBurst Time\tWait Time\tTurnAround Time<br>";
-            for (let i = 0; i < numProcesses; i++) {
-                output += (i + 1) + "\t\t\t " + arrival[i] + "\t\t\t " + burst[i] + "\t\t\t\t " + wait[i] + "\t\t\t\t " + turn[i] + "<br>";
-                avgWait += wait[i];
-                avgTT += turn[i];
-            }
-            output += "<br>Average wait time : " + (avgWait / numProcesses) + "<br>";
-            output += "<br>Average Turn Around Time : " + (avgTT / numProcesses) + "<br>";
+            function calculateRR() {
+                const tq = parseInt(document.getElementById('timeQuanta').value);
+                const numProcesses = parseInt(document.getElementById('processes').value);
+                const arrival = [];
+                const burst = [];
 
-            document.getElementById('output').innerHTML = output;
-        }
-    </script>
+                for (let i = 0; i < numProcesses; i++) {
+                    arrival.push(parseInt(document.getElementById(`arrival${i}`).value));
+                    burst.push(parseInt(document.getElementById(`burst${i}`).value));
+                }
+
+                let timer = 0;
+                let maxProccessIndex = 0;
+                let avgWait = 0;
+                let avgTT = 0;
+                const wait = [];
+                const turn = [];
+                const queue = [];
+                const temp_burst = [];
+                const complete = [];
+
+                for (let i = 0; i < numProcesses; i++) {
+                    temp_burst[i] = burst[i];
+                    complete[i] = false;
+                    queue[i] = 0;
+                }
+                while (timer < arrival[0])
+                    timer++;
+                queue[0] = 1;
+
+                while (true) {
+                    let flag = true;
+                    for (let i = 0; i < numProcesses; i++) {
+                        if (temp_burst[i] != 0) {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                        break;
+
+                    for (let i = 0; (i < numProcesses) && (queue[i] != 0); i++) {
+                        let ctr = 0;
+                        while ((ctr < tq) && (temp_burst[queue[0] - 1] > 0)) {
+                            temp_burst[queue[0] - 1] -= 1;
+                            timer += 1;
+                            ctr++;
+                            checkNewArrival(timer, arrival, numProcesses, maxProccessIndex, queue);
+                        }
+                        if ((temp_burst[queue[0] - 1] == 0) && (complete[queue[0] - 1] == false)) {
+                            turn[queue[0] - 1] = timer;
+                            complete[queue[0] - 1] = true;
+                        }
+
+                        let idle = true;
+                        if (queue[numProcesses - 1] == 0) {
+                            for (let i = 0; i < numProcesses && queue[i] != 0; i++) {
+                                if (complete[queue[i] - 1] == false) {
+                                    idle = false;
+                                }
+                            }
+                        }
+                        else
+                            idle = false;
+
+                        if (idle) {
+                            timer++;
+                            checkNewArrival(timer, arrival, numProcesses, maxProccessIndex, queue);
+                        }
+
+                        queueMaintainence(queue, numProcesses);
+                    }
+                }
+
+                for (let i = 0; i < numProcesses; i++) {
+                    turn[i] = turn[i] - arrival[i];
+                    wait[i] = turn[i] - burst[i];
+                }
+
+                let output = "<h2>Round Robin Results</h2>";
+                output += "<table>";
+                output += "<tr><th>Program No.</th><th>Arrival Time</th><th>Burst Time</th><th>Wait Time</th><th>Turnaround Time</th></tr>";
+                for (let i = 0; i < numProcesses; i++) {
+                    output += `<tr><td>${i + 1}</td><td>${arrival[i]}</td><td>${burst[i]}</td><td>${wait[i]}</td><td>${turn[i]}</td></tr>`;
+                    avgWait += wait[i];
+                    avgTT += turn[i];
+                }
+                output += "</table>";
+                output += "<br>";
+                output += `<strong>Average Wait Time:</strong> ${avgWait / numProcesses}<br>`;
+                output += `<strong>Average Turnaround Time:</strong> ${avgTT / numProcesses}<br>`;
+
+                document.getElementById('output').innerHTML = output;
+                
+                let ganttOutput = "<h2>Gantt Chart</h2>";
+                ganttOutput += "<div class='timeline'>";
+                for (let i = 0; i < numProcesses; i++) {
+                    ganttOutput += "<div></div>";
+                }
+                ganttOutput += "</div>";
+
+                let chart = "<div class='process-bar'>";
+                for (let i = 0; i < numProcesses; i++) {
+                    chart += `<div>${i + 1}</div>`;
+                }
+                chart += "</div>";
+
+                document.getElementById('ganttChart').innerHTML = ganttOutput + chart;
+            
+            }
+        </script>
+    </div>
 </body>
 </html>
